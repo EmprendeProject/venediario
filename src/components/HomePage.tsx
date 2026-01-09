@@ -6,7 +6,7 @@ export default function HomePage() {
     <div className="homepage">
       <section className="hero-section">
         <div className="hero-content">
-          <h1 className="hero-title">USDTPriceChart</h1>
+          <h1 className="hero-title">Precio del USDT en Venezuela</h1>
           <p className="hero-subtitle">
             Monitoreo en tiempo real del precio de USDT en Bolívares Venezolanos
           </p>
