@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts'
 import { Block, Preloader } from 'konsta/react'
+import { supabase } from '../lib/supabaseClient'
 
 interface PriceData {
   time: string
@@ -20,6 +21,7 @@ interface ApiResponse {
 
 const STORAGE_KEY = 'usdt_price_history'
 const ONE_MONTH_MS = 30 * 24 * 60 * 60 * 1000
+const SEVEN_DAYS_MS = 7 * 24 * 60 * 60 * 1000
 
 const loadStoredData = (): PriceData[] => {
   try {
@@ -27,7 +29,19 @@ const loadStoredData = (): PriceData[] => {
     if (stored) {
       const data: PriceData[] = JSON.parse(stored)
       const now = Date.now()
-      return data.filter(item => (now - item.timestamp) <= ONE_MONTH_MS)
+      return data
+        .filter(item => (now - item.timestamp) <= ONE_MONTH_MS)
+        .map((item) => {
+          // Normaliza historial antiguo donde compra/venta pudieron quedar invertidos.
+          if (
+            typeof item.buyPrice === 'number' &&
+            typeof item.sellPrice === 'number' &&
+            item.buyPrice > item.sellPrice
+          ) {
+            return { ...item, buyPrice: item.sellPrice, sellPrice: item.buyPrice }
+          }
+          return item
+        })
     }
   } catch (error) {
     console.error('Error loading stored data:', error)
@@ -76,9 +90,10 @@ export default function USDTPriceChart() {
           minute: '2-digit'
         })
 
+        // bid = compra (más bajo), ask = venta (más alto)
         setCurrentPrice({
-          buy: data.ask,
-          sell: data.bid,
+          buy: data.bid,
+          sell: data.ask,
           average: averagePrice
         })
 
@@ -90,8 +105,8 @@ export default function USDTPriceChart() {
             time: timeString,
             timestamp: timestamp,
             averagePrice: averagePrice,
-            buyPrice: data.ask,
-            sellPrice: data.bid
+            buyPrice: data.bid,
+            sellPrice: data.ask
           }
 
           const updatedData = [...recentData]
@@ -116,22 +131,85 @@ export default function USDTPriceChart() {
   }
 
   useEffect(() => {
-    const storedData = loadStoredData()
-    if (storedData.length > 0) {
-      setPriceData(storedData)
-      const lastData = storedData[storedData.length - 1]
-      if (lastData) {
-        setCurrentPrice({
-          buy: lastData.buyPrice || 0,
-          sell: lastData.sellPrice || 0,
-          average: lastData.averagePrice
-        })
-        setLastUpdate(new Date(lastData.timestamp))
+    const loadInitialHistory = async () => {
+      // 1) Intentar cargar histórico global desde Supabase (si está configurado)
+      if (supabase) {
+        try {
+          const fromTs = new Date(Date.now() - SEVEN_DAYS_MS).toISOString()
+
+          const { data, error } = await supabase
+            .from('usdt_prices')
+            .select('ts,bid,ask,avg')
+            .gte('ts', fromTs)
+            .order('ts', { ascending: true })
+
+          if (!error && data && data.length > 0) {
+            const mapped: PriceData[] = data.map((row: any) => {
+              const tsMs = new Date(row.ts).getTime()
+              const timeString = new Date(tsMs).toLocaleString('es-VE', {
+                month: 'short',
+                day: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit'
+              })
+
+              const bid = Number(row.bid)
+              const ask = Number(row.ask)
+              const avg = Number(row.avg)
+
+              return {
+                time: timeString,
+                timestamp: tsMs,
+                averagePrice: avg,
+                buyPrice: Math.min(bid, ask),
+                sellPrice: Math.max(bid, ask)
+              }
+            })
+
+            setPriceData(mapped)
+            saveData(mapped)
+
+            const last = mapped[mapped.length - 1]
+            if (last) {
+              setCurrentPrice({
+                buy: last.buyPrice || 0,
+                sell: last.sellPrice || 0,
+                average: last.averagePrice
+              })
+              setLastUpdate(new Date(last.timestamp))
+            }
+
+            setIsLoading(false)
+            return
+          }
+        } catch (e) {
+          console.error('Error loading Supabase history:', e)
+        }
       }
-      setIsLoading(false)
+
+      // 2) Fallback: localStorage
+      const storedData = loadStoredData()
+      if (storedData.length > 0) {
+        setPriceData(storedData)
+        const lastData = storedData[storedData.length - 1]
+        if (lastData) {
+          const buy = lastData.buyPrice || 0
+          const sell = lastData.sellPrice || 0
+          setCurrentPrice({
+            buy: Math.min(buy, sell),
+            sell: Math.max(buy, sell),
+            average: lastData.averagePrice
+          })
+          setLastUpdate(new Date(lastData.timestamp))
+        }
+        setIsLoading(false)
+      }
     }
 
-    fetchPriceData()
+    loadInitialHistory().finally(() => {
+      fetchPriceData()
+    })
+
     const interval = setInterval(fetchPriceData, 10000)
     const cleanupInterval = setInterval(() => {
       setPriceData(prev => {
