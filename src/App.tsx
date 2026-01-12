@@ -6,8 +6,8 @@ function App() {
   return (
     <KonstaProvider theme="ios">
       <KonstaApp safeAreas>
-        <div className="min-h-screen bg-[#f5f5f7]">
-          <div className="max-w-[600px] mx-auto bg-[#f5f5f7] shadow-xl min-h-screen">
+        <div className="min-h-screen bg-[#f5f5f7] flex justify-center">
+          <div className="w-full max-w-[720px] bg-[#f5f5f7] shadow-xl min-h-screen">
             <HomePage />
           </div>
         </div>

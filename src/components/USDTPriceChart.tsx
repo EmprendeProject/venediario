@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts'
+import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts'
 import { Block, Preloader } from 'konsta/react'
 
 interface PriceData {
@@ -175,6 +175,28 @@ export default function USDTPriceChart() {
     })
   }
 
+  // Custom Tooltip
+  const CustomTooltip = ({ active, payload, label }: any) => {
+    if (active && payload && payload.length) {
+      return (
+        <div className="bg-white/95 backdrop-blur-sm px-4 py-3 rounded-xl shadow-lg border border-gray-200">
+          <p className="text-xs font-semibold text-gray-900 mb-2">{label}</p>
+          {payload.map((entry: any, index: number) => (
+            <div key={index} className="flex items-center gap-2 text-xs">
+              <div
+                className="w-2 h-2 rounded-full"
+                style={{ backgroundColor: entry.color }}
+              />
+              <span className="text-gray-600">{entry.name}:</span>
+              <span className="font-semibold text-gray-900">{formatPrice(entry.value)}</span>
+            </div>
+          ))}
+        </div>
+      )
+    }
+    return null
+  }
+
   return (
     <>
       <Block className="flex justify-between items-center text-xs mb-4 !p-0">
@@ -198,27 +220,55 @@ export default function USDTPriceChart() {
         <>
           {currentPrice && (
             <Block className="grid grid-cols-3 gap-2 mb-4 !p-0">
-              <div className="text-center p-3 bg-gray-50 rounded-xl border border-gray-100">
-                <div className="text-[10px] text-gray-500 font-medium mb-1">Compra</div>
-                <div className="text-sm font-bold text-gray-900">{formatPrice(currentPrice.buy)}</div>
+              <div className="text-center p-3 bg-gradient-to-br from-green-50 to-emerald-50 rounded-xl border border-green-100">
+                <div className="text-[10px] text-green-700 font-semibold mb-1">Compra</div>
+                <div className="text-sm font-bold text-green-900">{formatPrice(currentPrice.buy)}</div>
               </div>
-              <div className="text-center p-3 bg-gray-50 rounded-xl border border-gray-100">
-                <div className="text-[10px] text-gray-500 font-medium mb-1">Venta</div>
-                <div className="text-sm font-bold text-gray-900">{formatPrice(currentPrice.sell)}</div>
+              <div className="text-center p-3 bg-gradient-to-br from-orange-50 to-amber-50 rounded-xl border border-orange-100">
+                <div className="text-[10px] text-orange-700 font-semibold mb-1">Venta</div>
+                <div className="text-sm font-bold text-orange-900">{formatPrice(currentPrice.sell)}</div>
               </div>
-              <div className="text-center p-3 bg-gray-50 rounded-xl border border-gray-100">
-                <div className="text-[10px] text-gray-500 font-medium mb-1">Promedio</div>
-                <div className="text-sm font-bold text-gray-900">{formatPrice(currentPrice.average)}</div>
+              <div className="text-center p-3 bg-gradient-to-br from-gray-800 to-gray-900 rounded-xl border border-gray-700">
+                <div className="text-[10px] text-gray-300 font-semibold mb-1">Promedio</div>
+                <div className="text-sm font-bold text-white">{formatPrice(currentPrice.average)}</div>
               </div>
             </Block>
           )}
 
           {priceData.length > 0 ? (
-            <div className="!p-0 !m-0 -mx-2">
-              <div style={{ width: '100%', height: windowWidth < 480 ? 280 : 380 }}>
+            <div className="m-0 bg-gradient-to-br from-gray-50 to-white rounded-2xl p-4 border border-gray-100">
+              <div style={{ width: '100%', height: windowWidth < 480 ? 300 : 400 }}>
                 <ResponsiveContainer width="100%" height="100%">
-                  <LineChart data={priceData} margin={{ top: 10, right: 10, left: -10, bottom: 50 }}>
-                    <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" opacity={0.5} />
+                  <AreaChart
+                    data={priceData}
+                    margin={{ top: 10, right: 10, left: 0, bottom: 50 }}
+                  >
+                    <defs>
+                      {/* Gradiente principal más pronunciado - de oscuro arriba a transparente abajo */}
+                      <linearGradient id="colorAverage" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="0%" stopColor="#111827" stopOpacity={0.5} />
+                        <stop offset="50%" stopColor="#111827" stopOpacity={0.2} />
+                        <stop offset="100%" stopColor="#111827" stopOpacity={0} />
+                      </linearGradient>
+                      {/* Gradiente verde para compra */}
+                      <linearGradient id="colorBuy" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="0%" stopColor="#10b981" stopOpacity={0.4} />
+                        <stop offset="50%" stopColor="#10b981" stopOpacity={0.15} />
+                        <stop offset="100%" stopColor="#10b981" stopOpacity={0} />
+                      </linearGradient>
+                      {/* Gradiente naranja para venta */}
+                      <linearGradient id="colorSell" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="0%" stopColor="#f97316" stopOpacity={0.4} />
+                        <stop offset="50%" stopColor="#f97316" stopOpacity={0.15} />
+                        <stop offset="100%" stopColor="#f97316" stopOpacity={0} />
+                      </linearGradient>
+                    </defs>
+                    <CartesianGrid
+                      strokeDasharray="3 3"
+                      stroke="#e5e7eb"
+                      opacity={0.3}
+                      vertical={false}
+                    />
                     <XAxis
                       dataKey="time"
                       angle={-45}
@@ -227,74 +277,81 @@ export default function USDTPriceChart() {
                       stroke="#9ca3af"
                       fontSize={10}
                       tick={{ fill: '#6b7280' }}
+                      tickLine={{ stroke: '#e5e7eb' }}
                     />
                     <YAxis
                       domain={getYAxisDomain()}
                       tickFormatter={(value) => formatPrice(value)}
-                      width={windowWidth < 480 ? 55 : 75}
+                      width={windowWidth < 480 ? 60 : 75}
                       stroke="#9ca3af"
                       fontSize={windowWidth < 480 ? 9 : 10}
                       tick={{ fill: '#6b7280' }}
+                      tickLine={{ stroke: '#e5e7eb' }}
                     />
-                    <Tooltip
-                      formatter={(value: number | undefined) => value ? formatPrice(value) : ''}
-                      labelStyle={{
-                        color: '#111827',
-                        fontWeight: 600,
-                        marginBottom: '6px',
-                        fontSize: '12px'
-                      }}
-                      contentStyle={{
-                        backgroundColor: '#ffffff',
-                        border: '1px solid #e5e7eb',
-                        borderRadius: '12px',
-                        boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)',
-                        padding: '10px'
-                      }}
-                      itemStyle={{
-                        color: '#374151',
-                        padding: '3px 0',
-                        fontSize: '12px'
-                      }}
-                    />
-                    <Legend
-                      wrapperStyle={{
-                        paddingTop: '15px',
-                        fontSize: '11px'
-                      }}
-                      iconType="line"
-                    />
-                    <Line
+                    <Tooltip content={<CustomTooltip />} />
+
+                    {/* Area principal con gradiente pronunciado */}
+                    <Area
                       type="monotone"
                       dataKey="averagePrice"
                       stroke="#111827"
-                      strokeWidth={2.5}
+                      strokeWidth={3}
+                      fill="url(#colorAverage)"
                       name="Promedio"
                       dot={false}
-                      activeDot={{ r: 5, fill: '#111827' }}
+                      activeDot={{
+                        r: 6,
+                        fill: '#111827',
+                        stroke: '#fff',
+                        strokeWidth: 2
+                      }}
+                      animationDuration={800}
+                      animationEasing="ease-in-out"
                     />
-                    <Line
+
+                    {/* Líneas secundarias - solo gradiente sin borde */}
+                    <Area
                       type="monotone"
                       dataKey="buyPrice"
-                      stroke="#10b981"
-                      strokeWidth={2}
-                      strokeDasharray="4 4"
+                      stroke="none"
+                      strokeWidth={0}
+                      fill="url(#colorBuy)"
                       name="Compra"
                       dot={false}
-                      activeDot={{ r: 4, fill: '#10b981' }}
+                      activeDot={{ r: 4, fill: '#10b981', stroke: '#fff', strokeWidth: 2 }}
+                      animationDuration={800}
+                      animationEasing="ease-in-out"
                     />
-                    <Line
+                    <Area
                       type="monotone"
                       dataKey="sellPrice"
-                      stroke="#f97316"
-                      strokeWidth={2}
-                      strokeDasharray="4 4"
+                      stroke="none"
+                      strokeWidth={0}
+                      fill="url(#colorSell)"
                       name="Venta"
                       dot={false}
-                      activeDot={{ r: 4, fill: '#f97316' }}
+                      activeDot={{ r: 4, fill: '#f97316', stroke: '#fff', strokeWidth: 2 }}
+                      animationDuration={800}
+                      animationEasing="ease-in-out"
                     />
-                  </LineChart>
+                  </AreaChart>
                 </ResponsiveContainer>
+              </div>
+
+              {/* Leyenda personalizada */}
+              <div className="flex items-center justify-center gap-4 mt-4 pt-3 border-t border-gray-100">
+                <div className="flex items-center gap-1.5">
+                  <div className="w-3 h-3 bg-gray-900 rounded-full"></div>
+                  <span className="text-xs text-gray-600 font-medium">Promedio</span>
+                </div>
+                <div className="flex items-center gap-1.5">
+                  <div className="w-3 h-0.5 bg-green-500 rounded-full"></div>
+                  <span className="text-xs text-gray-600 font-medium">Compra</span>
+                </div>
+                <div className="flex items-center gap-1.5">
+                  <div className="w-3 h-0.5 bg-orange-500 rounded-full"></div>
+                  <span className="text-xs text-gray-600 font-medium">Venta</span>
+                </div>
               </div>
             </div>
           ) : (

@@ -79,60 +79,62 @@ export default function CurrencyConverter({ rates }: Props) {
                 />
             </div>
 
-            {/* From Currency */}
-            <div className="mb-4">
-                <label className="block text-xs font-medium text-gray-500 mb-2">De</label>
-                <select
-                    value={fromCurrency}
-                    onChange={(e) => setFromCurrency(e.target.value as Currency)}
-                    className="w-full px-4 py-3 text-base font-medium text-gray-900 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:border-gray-900 transition-all appearance-none cursor-pointer"
-                    style={{
-                        backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%23111827'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E")`,
-                        backgroundRepeat: 'no-repeat',
-                        backgroundPosition: 'right 1rem center',
-                        backgroundSize: '1.25rem',
-                        paddingRight: '3rem'
-                    }}
-                >
-                    {currencyOptions.map(opt => (
-                        <option key={opt.value} value={opt.value}>
-                            {opt.flag} {opt.label} - {opt.name}
-                        </option>
-                    ))}
-                </select>
-            </div>
+            <div className="flex items-end gap-3">
+                {/* From Currency */}
+                <div className="flex-1">
+                    <label className="block text-xs font-medium text-gray-500 mb-1">De</label>
+                    <select
+                        value={fromCurrency}
+                        onChange={(e) => setFromCurrency(e.target.value as Currency)}
+                        className="w-full px-4 py-3 text-base font-medium text-gray-900 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:border-gray-900 transition-all appearance-none cursor-pointer"
+                        style={{
+                            backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%23111827'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E")`,
+                            backgroundRepeat: 'no-repeat',
+                            backgroundPosition: 'right 1rem center',
+                            backgroundSize: '1.25rem',
+                            paddingRight: '3rem'
+                        }}
+                    >
+                        {currencyOptions.map(opt => (
+                            <option key={opt.value} value={opt.value}>
+                                {opt.flag} {opt.label} - {opt.name}
+                            </option>
+                        ))}
+                    </select>
+                </div>
 
-            {/* Swap Button */}
-            <div className="flex justify-center my-4">
-                <Button
-                    className="!w-12 !h-12 !p-0 flex items-center justify-center !rounded-full !bg-gray-900 !text-white hover:!bg-gray-800 active:!scale-95 transition-all !shadow-md"
-                    onClick={handleSwap}
-                >
-                    <span className="text-xl">⇅</span>
-                </Button>
-            </div>
+                {/* Swap Button */}
+                <div className="flex items-center self-stretch">
+                    <Button
+                        className="!w-12 !h-12 !p-0 flex items-center justify-center !rounded-full !bg-gray-900 !text-white hover:!bg-gray-800 active:!scale-95 transition-all !shadow-md"
+                        onClick={handleSwap}
+                    >
+                        <span className="text-xl">⇅</span>
+                    </Button>
+                </div>
 
-            {/* To Currency */}
-            <div className="mb-5">
-                <label className="block text-xs font-medium text-gray-500 mb-2">A</label>
-                <select
-                    value={toCurrency}
-                    onChange={(e) => setToCurrency(e.target.value as Currency)}
-                    className="w-full px-4 py-3 text-base font-medium text-gray-900 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:border-gray-900 transition-all appearance-none cursor-pointer"
-                    style={{
-                        backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%23111827'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E")`,
-                        backgroundRepeat: 'no-repeat',
-                        backgroundPosition: 'right 1rem center',
-                        backgroundSize: '1.25rem',
-                        paddingRight: '3rem'
-                    }}
-                >
-                    {currencyOptions.map(opt => (
-                        <option key={opt.value} value={opt.value}>
-                            {opt.flag} {opt.label} - {opt.name}
-                        </option>
-                    ))}
-                </select>
+                {/* To Currency */}
+                <div className="flex-1">
+                    <label className="block text-xs font-medium text-gray-500 mb-1">A</label>
+                    <select
+                        value={toCurrency}
+                        onChange={(e) => setToCurrency(e.target.value as Currency)}
+                        className="w-full px-4 py-3 text-base font-medium text-gray-900 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:border-gray-900 transition-all appearance-none cursor-pointer"
+                        style={{
+                            backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%23111827'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E")`,
+                            backgroundRepeat: 'no-repeat',
+                            backgroundPosition: 'right 1rem center',
+                            backgroundSize: '1.25rem',
+                            paddingRight: '3rem'
+                        }}
+                    >
+                        {currencyOptions.map(opt => (
+                            <option key={opt.value} value={opt.value}>
+                                {opt.flag} {opt.label} - {opt.name}
+                            </option>
+                        ))}
+                    </select>
+                </div>
             </div>
 
             {/* Result Display */}

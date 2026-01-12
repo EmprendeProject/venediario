@@ -26,18 +26,22 @@ export default function HomePage() {
         className="!bg-transparent border-none"
       />
 
-      <Block className="px-5 pt-2 pb-4">
+      <Block className="px-5 pb-4" style={{ paddingTop: 'calc(env(safe-area-inset-top, 8px) + 12px)' }}>
         {/* Header */}
-        <div className="mb-6">
-          <h1 className="text-2xl font-semibold text-gray-900 mb-1">Monitor Dólar</h1>
-          <p className="text-sm text-gray-500">Tasas en tiempo real</p>
+        <div className="mb-6 flex items-start justify-between">
+          <div>
+            <h1 className="text-2xl font-semibold text-gray-900 -mb-1">venediario app</h1>
+          </div>
+          <div className="text-right">
+            <div className="text-xs text-gray-500">{rates.bcv ? formatDate(rates.bcv.date) : ''}</div>
+          </div>
         </div>
 
         {/* Hero Card - USDT Principal */}
-        <Card className="!m-0 !p-6 !rounded-3xl !shadow-lg bg-gradient-to-br from-gray-900 to-gray-800 mb-6">
-          <div className="flex items-center gap-2 mb-4">
-            <div className="w-10 h-10 bg-green-500 rounded-xl flex items-center justify-center">
-              <span className="text-white font-bold text-lg">₮</span>
+        <Card className="!m-0 !p-2 !pt-1 !pb-3 !rounded-3xl !shadow-lg bg-gradient-to-br from-gray-900 to-gray-800 mb-6">
+          <div className="flex items-center gap-1 mb-0.5">
+            <div className="w-7 h-7 bg-green-500 rounded-xl flex items-center justify-center">
+              <span className="text-white font-bold text-xs">₮</span>
             </div>
             <div className="flex-1">
               <div className="text-xs text-gray-400">USDT Binance</div>
@@ -45,52 +49,30 @@ export default function HomePage() {
             </div>
           </div>
 
-          <div className="mb-6">
-            <div className="text-4xl font-bold text-white mb-1">
+          <div className="mb-1">
+            <div className="text-xl font-bold text-white mb-0">
               {rates.usdt ? formatPrice(rates.usdt.average) : '...'}
             </div>
-            <div className="text-sm text-gray-400">VES</div>
+            <div className="text-xs text-gray-400">VES</div>
           </div>
 
-          <div className="grid grid-cols-3 gap-3">
-            <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-3 text-center">
-              <div className="text-xs text-gray-400 mb-1">Compra</div>
-              <div className="text-sm font-semibold text-white">
-                {rates.usdt ? formatPrice(rates.usdt.buy) : '...'}
-              </div>
-            </div>
-            <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-3 text-center">
-              <div className="text-xs text-gray-400 mb-1">Venta</div>
-              <div className="text-sm font-semibold text-white">
-                {rates.usdt ? formatPrice(rates.usdt.sell) : '...'}
-              </div>
-            </div>
-            <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-3 text-center">
-              <div className="text-xs text-gray-400 mb-1">Promedio</div>
-              <div className="text-sm font-semibold text-white">
-                {rates.usdt ? formatPrice(rates.usdt.average) : '...'}
-              </div>
-            </div>
-          </div>
+          {/* Tarjetas compactas eliminadas para reducir la altura del Hero */}
         </Card>
 
         {/* Tasas BCV */}
         <div className="mb-6">
-          <div className="flex items-center justify-between mb-3">
-            <h2 className="text-lg font-semibold text-gray-900">Tasas BCV</h2>
-            <span className="text-xs text-gray-500">{rates.bcv ? formatDate(rates.bcv.date) : ''}</span>
-          </div>
+          {/* Fecha movida al header superior */}
 
-          <div className="grid grid-cols-2 gap-3">
-            {/* USD BCV */}
-            <Card className="!m-0 !p-4 !rounded-2xl !shadow-sm bg-white border border-gray-100">
-              <div className="flex items-center gap-2 mb-3">
-                <div className="w-8 h-8 bg-blue-500 rounded-lg flex items-center justify-center">
-                  <span className="text-white font-bold text-sm">$</span>
+          <div className="grid grid-cols-2 gap-1">
+            {/* USD BCV (ultra compacta) */}
+            <Card className="!m-0 !p-1 !rounded-2xl !shadow-sm bg-white border border-gray-100">
+              <div className="flex items-center gap-0.5 mb-0.5">
+                <div className="w-5 h-5 bg-blue-500 rounded-lg flex items-center justify-center">
+                  <span className="text-white font-bold text-[10px]">$</span>
                 </div>
                 <span className="text-xs font-medium text-gray-600">USD</span>
               </div>
-              <div className="text-xl font-bold text-gray-900 mb-1">
+              <div className="text-sm font-bold text-gray-900 leading-tight mb-0">
                 {rates.bcv ? formatPrice(rates.bcv.usd) : '...'}
               </div>
               <div className="flex items-center gap-1">
@@ -104,15 +86,15 @@ export default function HomePage() {
               </div>
             </Card>
 
-            {/* EUR BCV */}
-            <Card className="!m-0 !p-4 !rounded-2xl !shadow-sm bg-white border border-gray-100">
-              <div className="flex items-center gap-2 mb-3">
-                <div className="w-8 h-8 bg-purple-500 rounded-lg flex items-center justify-center">
-                  <span className="text-white font-bold text-sm">€</span>
+            {/* EUR BCV (ultra compacta) */}
+            <Card className="!m-0 !p-1 !rounded-2xl !shadow-sm bg-white border border-gray-100">
+              <div className="flex items-center gap-0.5 mb-0.5">
+                <div className="w-5 h-5 bg-purple-500 rounded-lg flex items-center justify-center">
+                  <span className="text-white font-bold text-[10px]">€</span>
                 </div>
                 <span className="text-xs font-medium text-gray-600">EUR</span>
               </div>
-              <div className="text-xl font-bold text-gray-900 mb-1">
+              <div className="text-sm font-bold text-gray-900 leading-tight mb-0">
                 {rates.bcv ? formatPrice(rates.bcv.eur, 2) : '...'}
               </div>
               <div className="flex items-center gap-1">
@@ -130,13 +112,13 @@ export default function HomePage() {
 
         {/* Convertidor */}
         <div className="mb-6">
-          <h2 className="text-lg font-semibold text-gray-900 mb-3">Convertidor</h2>
+          <h2 className="text-lg font-semibold text-gray-900 mb-3">Calculadora</h2>
           <CurrencyConverter rates={rates} />
         </div>
 
         {/* Gráfico */}
         <div className="mb-6">
-          <h2 className="text-lg font-semibold text-gray-900 mb-3">Histórico USDT</h2>
+          <h2 className="text-lg font-semibold text-gray-900 mb-3">Grafico USDT Binance</h2>
           <Card className="!m-0 !p-4 !rounded-2xl !shadow-sm bg-white border border-gray-100">
             <USDTPriceChart />
           </Card>
