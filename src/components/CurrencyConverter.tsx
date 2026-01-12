@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { Card, Button } from 'konsta/react'
+import { Card } from 'konsta/react'
 import type { ExchangeRates } from '../hooks/useExchangeRates'
 
 interface Props {
@@ -9,7 +9,7 @@ interface Props {
 type Currency = 'VES' | 'USD' | 'EUR' | 'USDT'
 
 const currencyOptions = [
-    { value: 'VES', label: 'VES', flag: '🇻🇪', name: 'Bolívares' },
+    { value: 'VES', label: 'Bs', flag: '🇻🇪', name: 'Bolívares' },
     { value: 'USD', label: 'USD', flag: '🇺🇸', name: 'Dólar BCV' },
     { value: 'EUR', label: 'EUR', flag: '🇪🇺', name: 'Euro BCV' },
     { value: 'USDT', label: 'USDT', flag: '💰', name: 'Binance' },
@@ -65,9 +65,9 @@ export default function CurrencyConverter({ rates }: Props) {
     }
 
     return (
-        <Card className="!m-0 !p-5 !rounded-2xl !shadow-sm bg-white border border-gray-100">
+        <Card className="!m-0 !p-4 !rounded-2xl !shadow-sm bg-white border border-gray-100">
             {/* Amount Input */}
-            <div className="mb-4">
+            <div className="mb-3">
                 <label className="block text-xs font-medium text-gray-500 mb-2">Monto</label>
                 <input
                     type="number"
@@ -105,12 +105,29 @@ export default function CurrencyConverter({ rates }: Props) {
 
                 {/* Swap Button */}
                 <div className="flex items-center self-stretch">
-                    <Button
-                        className="!w-12 !h-12 !p-0 flex items-center justify-center !rounded-full !bg-gray-900 !text-white hover:!bg-gray-800 active:!scale-95 transition-all !shadow-md"
+                    <button
+                        type="button"
+                        className="w-12 h-12 p-0 flex items-center justify-center rounded-full bg-gray-900 text-white shadow-md focus:outline-none"
                         onClick={handleSwap}
                     >
-                        <span className="text-xl">⇅</span>
-                    </Button>
+                        <svg
+                            viewBox="0 0 24 24"
+                            width="20"
+                            height="20"
+                            className="block"
+                            aria-hidden="true"
+                            focusable="false"
+                        >
+                            <path
+                                d="M7 7h11m0 0-3-3m3 3-3 3M17 17H6m0 0 3 3m-3-3 3-3"
+                                fill="none"
+                                stroke="currentColor"
+                                strokeWidth="2"
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                            />
+                        </svg>
+                    </button>
                 </div>
 
                 {/* To Currency */}
@@ -138,7 +155,7 @@ export default function CurrencyConverter({ rates }: Props) {
             </div>
 
             {/* Result Display */}
-            <div className="pt-5 border-t border-gray-100 text-center">
+            <div className="pt-4 text-center">
                 <div className="text-xs text-gray-500 mb-2">
                     {amount || '0'} {getSelectedCurrency(fromCurrency)?.flag} {fromCurrency} =
                 </div>

@@ -38,7 +38,7 @@ export default function HomePage() {
         </div>
 
         {/* Hero Card - USDT Principal */}
-        <Card className="!m-0 !p-2 !pt-1 !pb-3 !rounded-3xl !shadow-lg bg-gradient-to-br from-gray-900 to-gray-800 mb-6">
+        <Card className="!m-0 !p-2 !pt-1 !pb-5 !rounded-3xl !shadow-lg bg-gradient-to-br from-gray-900 to-gray-800 !mb-2">
           <div className="flex items-center gap-1 mb-0.5">
             <div className="w-7 h-7 bg-green-500 rounded-xl flex items-center justify-center">
               <span className="text-white font-bold text-xs">₮</span>
@@ -53,14 +53,14 @@ export default function HomePage() {
             <div className="text-xl font-bold text-white mb-0">
               {rates.usdt ? formatPrice(rates.usdt.average) : '...'}
             </div>
-            <div className="text-xs text-gray-400">VES</div>
+            <div className="text-xs text-gray-400">Bs</div>
           </div>
 
           {/* Tarjetas compactas eliminadas para reducir la altura del Hero */}
         </Card>
 
         {/* Tasas BCV */}
-        <div className="mb-6">
+        <div className="mb-3">
           {/* Fecha movida al header superior */}
 
           <div className="grid grid-cols-2 gap-1">
@@ -76,7 +76,7 @@ export default function HomePage() {
                 {rates.bcv ? formatPrice(rates.bcv.usd) : '...'}
               </div>
               <div className="flex items-center gap-1">
-                <span className="text-xs text-gray-500">VES</span>
+                <span className="text-xs text-gray-500">Bs</span>
                 {rates.bcv && (
                   <span className={`text-xs font-semibold ml-auto ${rates.bcv.changeUsd >= 0 ? 'text-green-600' : 'text-red-600'
                     }`}>
@@ -98,7 +98,7 @@ export default function HomePage() {
                 {rates.bcv ? formatPrice(rates.bcv.eur, 2) : '...'}
               </div>
               <div className="flex items-center gap-1">
-                <span className="text-xs text-gray-500">VES</span>
+                <span className="text-xs text-gray-500">Bs</span>
                 {rates.bcv && (
                   <span className={`text-xs font-semibold ml-auto ${rates.bcv.changeEur >= 0 ? 'text-green-600' : 'text-red-600'
                     }`}>
@@ -111,8 +111,8 @@ export default function HomePage() {
         </div>
 
         {/* Convertidor */}
-        <div className="mb-6">
-          <h2 className="text-lg font-semibold text-gray-900 mb-3">Calculadora</h2>
+        <div className="mb-4">
+          <h2 className="text-lg font-semibold text-gray-900 mb-2">Calculadora</h2>
           <CurrencyConverter rates={rates} />
         </div>
 
