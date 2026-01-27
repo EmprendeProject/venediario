@@ -27,36 +27,60 @@ export const useExchangeRates = () => {
     })
 
     const fetchRates = async () => {
+        const newRates: Partial<ExchangeRates> = { loading: false, error: null }
+        
+        // 1. Fetch USDT Rates (Independent fetch)
         try {
-            // Fetch BCV Rates
-            const bcvResponse = await fetch('https://api.dolarvzla.com/public/exchange-rate')
-            const bcvData = await bcvResponse.json()
-
-            // Fetch USDT Rates
             const usdtResponse = await fetch('https://criptoya.com/api/binancep2p/usdt/ves')
-            const usdtData = await usdtResponse.json()
-
-            setRates({
-                bcv: {
-                    usd: bcvData.current.usd,
-                    eur: bcvData.current.eur,
-                    date: bcvData.current.date,
-                    changeUsd: bcvData.changePercentage.usd,
-                    changeEur: bcvData.changePercentage.eur
-                },
-                usdt: {
+            if (usdtResponse.ok) {
+                const usdtData = await usdtResponse.json()
+                newRates.usdt = {
                     buy: usdtData.ask,
                     sell: usdtData.bid,
                     average: (usdtData.ask + usdtData.bid) / 2,
-                    timestamp: Date.now()
-                },
-                loading: false,
-                error: null
-            })
+                    timestamp: usdtData.time || Date.now() / 1000
+                }
+            } else {
+                console.error('USDT API Error:', usdtResponse.status)
+            }
         } catch (err) {
-            console.error('Error fetching rates:', err)
-            setRates(prev => ({ ...prev, loading: false, error: 'Error al cargar las tasas' }))
+            console.error('Error fetching USDT rates:', err)
         }
+
+        // 2. Fetch BCV Rates (Independent fetch)
+        try {
+            // Try official BCV API first (currently requiring auth, so we skip or use fallback)
+            // Fallback to ve.dolarapi.com which is free and open
+            const bcvResponse = await fetch('https://ve.dolarapi.com/v1/dolares/oficial')
+            
+            if (bcvResponse.ok) {
+                const bcvData = await bcvResponse.json()
+                
+                // Note: This API primarily gives USD. We'll use 0 for EUR if not found, 
+                // or try to approximate/fetch from another endpoint if needed.
+                // It doesn't provide change% directly, so we'll set to 0 to avoid crashes.
+                newRates.bcv = {
+                    usd: bcvData.promedio,
+                    eur: 0, // Not available in this endpoint
+                    date: bcvData.fechaActualizacion || new Date().toISOString(),
+                    changeUsd: 0, // Not available
+                    changeEur: 0  // Not available
+                }
+            } else {
+                console.error('BCV API Error:', bcvResponse.status)
+                // If this fails, we just don't set bcv, so it remains null (or previous value)
+            }
+        } catch (err) {
+            console.error('Error fetching BCV rates:', err)
+        }
+
+        setRates(prev => ({
+            ...prev,
+            ...newRates,
+            // Keep previous data if new fetch failed for that specific part
+            bcv: newRates.bcv || prev.bcv,
+            usdt: newRates.usdt || prev.usdt
+        }))
     }
 
     useEffect(() => {

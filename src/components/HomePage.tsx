@@ -2,6 +2,7 @@ import { Page, Navbar, Block, Card } from 'konsta/react'
 import USDTPriceChart from './USDTPriceChart'
 import CurrencyConverter from './CurrencyConverter'
 import { useExchangeRates } from '../hooks/useExchangeRates'
+import AddToHomeScreenCTA from './AddToHomeScreenCTA'
 
 export default function HomePage() {
   const rates = useExchangeRates()
@@ -123,6 +124,9 @@ export default function HomePage() {
             <USDTPriceChart />
           </Card>
         </div>
+
+        {/* CTA al final */}
+        <AddToHomeScreenCTA />
       </Block>
     </Page>
   )

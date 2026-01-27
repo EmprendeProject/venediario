@@ -1,18 +1,18 @@
 {
-  "name": "Monitor Dólar",
-  "short_name": "USDT Monitor",
+  "name": "venediario app",
+  "short_name": "venediario",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#ffffff",
   "theme_color": "#007aff",
   "icons": [
     {
-      "src": "/logo-192.png",
+      "src": "/pwa-192.png",
       "sizes": "192x192",
       "type": "image/png"
     },
     {
-      "src": "/logo-512.png",
+      "src": "/pwa-512.png",
       "sizes": "512x512",
       "type": "image/png"
     }
