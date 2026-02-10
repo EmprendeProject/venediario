@@ -28,7 +28,7 @@ export const useExchangeRates = () => {
 
     const fetchRates = async () => {
         const newRates: Partial<ExchangeRates> = { loading: false, error: null }
-        
+
         // 1. Fetch USDT Rates (Independent fetch)
         try {
             const usdtResponse = await fetch('https://criptoya.com/api/binancep2p/usdt/ves')
@@ -49,53 +49,25 @@ export const useExchangeRates = () => {
 
         // 2. Fetch BCV Rates (Independent fetch)
         try {
-            // Try official BCV API first (currently requiring auth, so we skip or use fallback)
-            // Fallback to ve.dolarapi.com which is free and open
-            const bcvResponse = await fetch('https://ve.dolarapi.com/v1/dolares/oficial')
-            
-            if (bcvResponse.ok) {
-                const bcvData = await bcvResponse.json()
-                
-                // Note: This API primarily gives USD. We'll use 0 for EUR if not found, 
-                // or try to approximate/fetch from another endpoint if needed.
-                // It doesn't provide change% directly, so we'll set to 0 to avoid crashes.
+            // Fetch USD rate from new BCV API (proxied through Vite to avoid CORS)
+            const bcvUsdResponse = await fetch('/api/bcv/usd')
+            // Fetch EUR rate from new BCV API (proxied through Vite to avoid CORS)
+            const bcvEurResponse = await fetch('/api/bcv/eur')
+
+            if (bcvUsdResponse.ok && bcvEurResponse.ok) {
+                const bcvUsdData = await bcvUsdResponse.json()
+                const bcvEurData = await bcvEurResponse.json()
+
                 newRates.bcv = {
-                    usd: bcvData.promedio,
-                    eur: 0, // Not available in this endpoint
-                    date: bcvData.fechaActualizacion || new Date().toISOString(),
-                    changeUsd: 0, // Not available
-                    changeEur: 0  // Not available
+                    usd: bcvUsdData.rate,
+                    eur: bcvEurData.rate,
+                    date: new Date().toISOString(),
+                    changeUsd: 0, // Not available in this API
+                    changeEur: 0  // Not available in this API
                 }
             } else {
-                console.error('BCV API Error:', bcvResponse.status)
+                console.error('BCV API Error:', bcvUsdResponse.status, bcvEurResponse.status)
                 // If this fails, we just don't set bcv, so it remains null (or previous value)
-            }
-
-            // 3. Fetch Cross Rate USD/EUR (to calculate BCV EUR)
-            // Since BCV doesn't provide EUR in the free API, we calculate it: EUR_BCV = USD_BCV * (1 / EUR_USD_RATE)
-            if (newRates.bcv && newRates.bcv.usd > 0) {
-                try {
-                    const crossRateResponse = await fetch('https://open.er-api.com/v6/latest/USD')
-                    if (crossRateResponse.ok) {
-                        const crossRateData = await crossRateResponse.json()
-                        const eurToUsd = crossRateData.rates.EUR
-                        // If 1 USD = 0.92 EUR, then 1 EUR = 1/0.92 USD = 1.08 USD
-                        // So if BCV USD is 355, then BCV EUR should be 355 * (1/0.92) approx.
-                        
-                        // Actually logic: 
-                        // We want price of 1 EUR in VES.
-                        // We have price of 1 USD in VES (newRates.bcv.usd).
-                        // We have price of 1 USD in EUR (eurToUsd). 
-                        // 1 EUR = (1 / eurToUsd) USD.
-                        // Value of 1 EUR in VES = (1 / eurToUsd) * Value of 1 USD in VES.
-                        
-                        if (eurToUsd) {
-                            newRates.bcv.eur = newRates.bcv.usd * (1 / eurToUsd)
-                        }
-                    }
-                } catch (err) {
-                    console.error('Error fetching cross rates:', err)
-                }
             }
         } catch (err) {
             console.error('Error fetching BCV rates:', err)
